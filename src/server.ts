@@ -1,49 +1,54 @@
 import express, { Request, Response } from 'express';
-import userRoutes from './routes/userRoutes';
+import sequelize from './config/database'; 
+import userRoutes from './routes/userRoutes'; 
+import User from './models/User';
 
-// Création de l'application Express
 const app = express();
 const port = 3000;
 
-// Définition de la route GET sur la racine "/"
+// Middleware pour lire le JSON
+app.use(express.json());
+
+// Permet de servir les fichiers statiques (HTML, CSS, JS) du dossier "public"
+app.use(express.static('public'));
+
+// Routes du TP1
 app.get('/', (req: Request, res: Response) => {
   res.send('Bienvenue sur mon serveur API');
 });
 
-// "Pour toutes les routes commençant par /api/users, va voir dans userRoutes"
-app.use('/api/users', userRoutes);
-
-// On définit la forme d'un étudiant (Typage)
-interface Etudiant {
-    id: number;
-    nom: string;
-    prenom: string;
-}
-
-// On crée les données
-const etudiants: Etudiant[] = [
-    { id: 1, nom: "Dupont", prenom: "Jean" },
-    { id: 2, nom: "Martin", prenom: "Sophie" },
-    { id: 3, nom: "Doe", prenom: "John" },
-];
-
-// La route API
 app.get('/api/data', (req: Request, res: Response) => {
-    // .json() convertit automatiquement ton tableau en format JSON
+    const etudiants = [
+        { id: 1, nom: "Dupont", prenom: "Jean" },
+        { id: 2, nom: "Martin", prenom: "Sophie" },
+        { id: 3, nom: "Doe", prenom: "John" },
+    ];
     res.json(etudiants);
 });
 
-// Le ":name" indique que c'est une variable
 app.get('/api/hello/:name', (req: Request, res: Response) => {
-    const name = req.params.name; // On récupère la variable
-    
+    const name = req.params.name;
     res.json({
         message: `Bonjour ${name}`,
-        timestamp: new Date().toISOString() // La date actuelle formatée
+        timestamp: new Date().toISOString()
     });
 });
 
-// Démarrage du serveur
-app.listen(port, () => {
-  console.log(`Serveur démarré sur http://localhost:${port}`);
-});
+// Routes modulaires
+app.use('/api/users', userRoutes);
+
+
+// --- Point 2.4 : Synchronisation et Démarrage ---
+// On synchronise la DB avant de lancer le serveur
+sequelize.sync({ force: false }) 
+  .then(() => {
+    console.log("✅ Base de données synchronisée !");
+    
+    // Le serveur ne démarre QUE si la DB est prête
+    app.listen(port, () => {
+      console.log(`Serveur démarré sur http://localhost:${port}`);
+    });
+  })
+  .catch((error: Error) => {
+    console.error("❌ Erreur lors du démarrage :", error);
+  });
