@@ -19,7 +19,7 @@ async function loadUsers() {
             li.className = 'list-group-item d-flex justify-content-between align-items-center';
             
             // Texte de l'utilisateur
-            li.textContent = `${user.prenom} ${user.nom}`;
+            li.textContent = `${user.prenom} ${user.nom} (${user.age} ans)`;
 
             // --- NOUVEAU : Bouton de suppression ---
             const deleteBtn = document.createElement('button');
@@ -44,11 +44,12 @@ userForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const nom = document.getElementById('nom').value;
     const prenom = document.getElementById('prenom').value;
+    const age = document.getElementById('age').value;
 
     await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ nom, prenom })
+        body: JSON.stringify({ nom, prenom, age })
     });
 
     userForm.reset();

@@ -5,6 +5,7 @@ class User extends Model {
   public id!: number;
   public nom!: string;
   public prenom!: string;
+  public age!: number;
 }
 
 User.init(
@@ -21,6 +22,10 @@ User.init(
     prenom: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    age: {
+      type: DataTypes.INTEGER,
+      allowNull: false, // On rend l'âge obligatoire
     },
   },
   {
