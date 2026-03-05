@@ -2,12 +2,15 @@ import express, { Request, Response } from 'express';
 import sequelize from './config/database'; 
 import userRoutes from './routes/userRoutes'; 
 import User from './models/User';
+import { requestLogger } from './middlewares/logger';
+import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
 const port = 3000;
 
 // Middleware pour lire le JSON
 app.use(express.json());
+app.use(requestLogger);
 
 // Permet de servir les fichiers statiques (HTML, CSS, JS) du dossier "public"
 app.use(express.static('public'));
@@ -37,6 +40,7 @@ app.get('/api/hello/:name', (req: Request, res: Response) => {
 // Routes modulaires
 app.use('/api/users', userRoutes);
 
+app.use(errorHandler);
 
 // --- Point 2.4 : Synchronisation et Démarrage ---
 // On synchronise la DB avant de lancer le serveur
