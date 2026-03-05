@@ -4,12 +4,15 @@ import userRoutes from './routes/userRoutes';
 import User from './models/User';
 import { requestLogger } from './middlewares/logger';
 import { errorHandler } from './middlewares/errorHandler';
+import swaggerUi from "swagger-ui-express";
+import { swaggerSpec } from "./config/swagger";
 
 const app = express();
 const port = 3000;
 
 // Middleware pour lire le JSON
 app.use(express.json());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use(requestLogger);
 
 // Permet de servir les fichiers statiques (HTML, CSS, JS) du dossier "public"
